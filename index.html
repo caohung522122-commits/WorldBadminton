@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- SHINE BADMINTON: Trang chính của website. -->
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="#101b2b" name="theme-color"/>
+  <meta content="Kh&aacute;m ph&aacute; trang bị cầu l&ocirc;ng, hồ sơ tuyển thủ v&agrave; sản phẩm ph&ugrave; hợp cho người chơi." name="description"/>
+  <title>
+   Shine Badminton
+  </title>
+  <link href="style.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <header>
+   <nav class="nav wrap">
+    <a class="brand" href="#top">
+     SHINE
+     <b>
+      BADMINTON
+     </b>
+    </a>
+    <div class="navlinks">
+     <a href="#players">
+      Tuyển thủ
+     </a>
+     <a href="#shop">
+      &Dstrok;ồ nghề phổ biến
+     </a>
+     <a href="#beginner">
+      Người mới chơi
+     </a>
+    </div>
+    <button class="admin-btn" id="openAdmin">
+     QUẢN TRỊ &nearrow;
+    </button>
+   </nav>
+   <section class="hero wrap" id="top">
+    <div>
+     <div class="eyebrow">
+      BADMINTON GEAR &amp; ATHLETE STORIES
+     </div>
+     <h1>
+      THE GEAR
+      <br/>
+      BEHIND
+      <em>
+       THE GAME.
+      </em>
+     </h1>
+     <p>
+      Kh&aacute;m ph&aacute; trang bị của những tay vợt h&agrave;ng &dstrok;ầu v&agrave; t&igrave;m những m&oacute;n &dstrok;ồ ph&ugrave; hợp với h&agrave;nh tr&igrave;nh cầu l&ocirc;ng của bạn.
+     </p>
+     <a class="btn primary" href="#players">
+      KH&Aacute;M PH&Aacute; TUYỂN THỦ &darr;
+     </a>
+     <a class="btn secondary" href="#shop">
+      XEM SẢN PHẨM
+     </a>
+    </div>
+    <div class="hero-art">
+     <div class="racket">
+     </div>
+    </div>
+   </section>
+  </header>
+  <main class="wrap">
+   <section id="players">
+    <div class="head">
+     <div>
+      <div class="kicker">
+       EXPLORE THE PLAYERS
+      </div>
+      <h2>
+       &Dstrok;ồ nghề tuyển thủ
+      </h2>
+     </div>
+     <p class="note">
+     </p>
+    </div>
+    <!-- Ô tìm kiếm tuyển thủ theo tên, quốc gia hoặc nội dung thi đấu -->
+    <div class="player-search">
+     <span class="player-search-icon" aria-hidden="true">⌕</span>
+     <input id="playerSearch" type="search" placeholder="Tìm vận động viên..." aria-label="Tìm vận động viên theo tên, quốc gia hoặc nội dung thi đấu" autocomplete="off"/>
+    </div>
+    <div class="filters">
+     <button class="filter active" data-filter="all">
+      Tất cả
+     </button>
+     <button class="filter" data-filter="&Dstrok;ơn nam">
+      &Dstrok;ơn nam
+     </button>
+     <button class="filter" data-filter="&Dstrok;ơn nữ">
+      &Dstrok;ơn nữ
+     </button>
+     <button class="filter" data-filter="&Dstrok;&ocirc;i nam">
+      &Dstrok;&ocirc;i nam
+     </button>
+     <button class="filter" data-filter="&Dstrok;&ocirc;i nữ">
+      &Dstrok;&ocirc;i nữ
+     </button>
+     <button class="filter" data-filter="&Dstrok;&ocirc;i nam nữ">
+      &Dstrok;&ocirc;i nam nữ
+     </button>
+    </div>
+    <div class="players" id="playerGrid">
+    </div>
+   </section>
+   <section class="shop" id="shop">
+    <div class="section-top">
+     <div>
+      <div class="kicker">
+       SHINE BADMINTON STORE
+      </div>
+      <h2>
+       &Dstrok;ồ nghề cầu l&ocirc;ng anh em mua nhiều nhất
+      </h2>
+     </div>
+     <p>
+     </p>
+    </div>
+    <div class="products" id="popularProducts">
+    </div>
+   </section>
+   <section class="shop beginner-shop" id="beginner">
+    <div class="section-top">
+     <div>
+      <div class="kicker">
+       START YOUR JOURNEY
+      </div>
+      <h2>
+       Bộ &dstrok;ồ nghề cho người mới
+      </h2>
+     </div>
+     <p>
+     </p>
+    </div>
+    <div class="products" id="beginnerProducts">
+    </div>
+   </section>
+  </main>
+  <footer>
+   <div class="foot">
+    <span>
+     &copy; SHINE BADMINTON
+    </span>
+    <span>
+     GEAR &bull; ATHLETES &bull; BADMINTON
+    </span>
+   </div>
+  </footer>
+  <div aria-hidden="true" class="overlay" id="detailOverlay">
+   <div class="dialog">
+    <div class="dialog-head">
+     <h2>
+      Hồ sơ vận &dstrok;ộng vi&ecirc;n
+     </h2>
+     <button class="close" data-close="detailOverlay">
+      &Dstrok;&Oacute;NG ✕
+     </button>
+    </div>
+    <div class="detail-body" id="detailContent">
+    </div>
+   </div>
+  </div>
+  <div aria-hidden="true" class="overlay" id="adminOverlay">
+   <div class="dialog">
+    <div class="dialog-head">
+     <h2>
+      SHINE BADMINTON / QUẢN TRỊ
+     </h2>
+     <button class="close" data-close="adminOverlay">
+      &Dstrok;&Oacute;NG ✕
+     </button>
+    </div>
+    <div class="admin-body">
+     <div class="admin-actions" style="justify-content:flex-end;margin-bottom:14px">
+      <span class="meta" id="adminIdentity">
+      </span>
+      <button class="logout-btn" id="logoutAdmin">
+       &Dstrok;&Abreve;NG XUẤT
+      </button>
+     </div>
+     <div class="admin-layout">
+      <aside class="admin-side">
+       <button class="active" data-admin-tab="athletes">
+        &Dstrok;ồ nghề tuyển thủ
+       </button>
+       <button data-admin-tab="popular">
+        &Dstrok;ồ nghề mua nhiều
+       </button>
+       <button data-admin-tab="beginner">
+        Bộ &dstrok;ồ nghề người mới
+       </button>
+      </aside>
+      <div class="admin-main" id="adminMain">
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script defer="" src="app.js">
+  </script>
+ </body>
+</html>
