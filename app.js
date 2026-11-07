@@ -1,5 +1,5 @@
 // =============================================================
-// SHINE BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT
+// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT
 // Mã được chia thành các phần có chú thích tiếng Việt.
 // =============================================================
 
@@ -25,7 +25,7 @@ const seedBeginner=[
 ];
 
 // PHẦN 4 - ĐỊA CHỈ MÁY CHỦ: thay bằng URL Cloudflare Worker sau khi triển khai.
-const API_BASE='https://YOUR-SHINE-WORKER.workers.dev';
+const API_BASE='https://YOUR-WORLD-WORKER.workers.dev';
 
 // PHẦN 5 - ĐỌC DỮ LIỆU DỰ PHÒNG từ bộ nhớ trình duyệt.
 function load(key,fallback){try{const x=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(x)?x:fallback}catch(e){return fallback}}
@@ -34,7 +34,7 @@ let activeFilter='all',editingId=null,editingProductId=null,productGroup='popula
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // PHẦN 6 - KẾT NỐI API: gửi yêu cầu đến Cloudflare Worker.
-async function api(path,options={}){if(API_BASE.includes('YOUR-SHINE-WORKER'))throw new Error('Chưa cấu hình địa chỉ Cloudflare Worker.');const headers={...(options.headers||{})};if(options.body)headers['Content-Type']='application/json';const r=await fetch(API_BASE+path,{...options,headers,credentials:'include'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Không thể kết nối máy chủ.');return j}
+async function api(path,options={}){if(API_BASE.includes('YOUR-WORLD-WORKER'))throw new Error('Chưa cấu hình địa chỉ Cloudflare Worker.');const headers={...(options.headers||{})};if(options.body)headers['Content-Type']='application/json';const r=await fetch(API_BASE+path,{...options,headers,credentials:'include'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Không thể kết nối máy chủ.');return j}
 
 // PHẦN 7 - LƯU DỮ LIỆU: ghi hồ sơ và sản phẩm lên máy chủ.
 async function persist(){try{await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});localStorage.setItem('shineAthletes',JSON.stringify(athletes));localStorage.setItem('shinePopularProducts',JSON.stringify(popular));localStorage.setItem('shineBeginnerProducts',JSON.stringify(beginner));return true}catch(e){alert('Không thể lưu dữ liệu: '+e.message);return false}}
@@ -59,7 +59,7 @@ function renderPlayers(){
   const searchable=[a.name,a.country,a.discipline].map(normalizeSearch).join(' ');
   return matchesFilter&&(!keyword||searchable.includes(keyword));
  });
- grid.innerHTML=results.map(a=>`<button class="player-card ${a.image?'has-photo':''}" style="${a.image?`background-image:url('${esc(a.image)}')`:''}" data-open-player="${esc(a.id)}"><span class="person" style="${a.image?'display:none':''}"></span><span class="pinfo"><span class="tag">${esc((a.discipline||'').toUpperCase())}</span><h3>${esc(a.name)}</h3><span class="meta">🌏 ${esc(a.country||'Chưa cập nhật')} · ${esc(a.discipline)}</span><span class="view">XEM HỒ SƠ & TRANG BỊ <b>↗</b></span></span></button>`).join('')||'<p class="player-empty">Không tìm thấy vận động viên phù hợp.</p>';
+ grid.innerHTML=results.map(a=>`<button class="player-card ${a.image?'has-photo':''}" style="${a.image?`background-image:url('${esc(a.image)}')`:''}" data-open-player="${esc(a.id)}"><span class="person" style="${a.image?'display:none':''}"></span><span class="pinfo"><span class="tag">${esc((a.discipline||'').toUpperCase())}</span><h3>${esc(a.name)}</h3><span class="meta">🌏 ${esc(a.country||'Chưa cập nhật')} · ${esc(a.discipline)}</span><span class="view">XEM HỒ SƠ & TRANG BỊ <b>↗</b></span></span></button>`).join('')||(keyword||activeFilter!=='all'?'<p class="player-empty">Không tìm thấy vận động viên phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.</p>':'<div class="player-empty"><strong>Chưa có hồ sơ tuyển thủ.</strong><br>Danh sách sẽ xuất hiện sau khi bạn thêm hồ sơ trong mục Quản trị. Hãy cấu hình Cloudflare Worker và tài khoản GitHub quản trị trước khi thêm dữ liệu.</div>');
 }
 
 // PHẦN 10 - HIỂN THỊ CÁC NHÓM SẢN PHẨM trên trang chủ.
