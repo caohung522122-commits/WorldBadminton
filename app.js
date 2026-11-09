@@ -3,8 +3,6 @@
 // Mã được chia thành các phần có chú thích tiếng Việt.
 // =============================================================
 
-
-
 // PHẦN 1 - DỮ LIỆU MẪU: danh sách tuyển thủ khởi tạo.
 const seedAthletes=[];
 
@@ -24,8 +22,8 @@ const seedBeginner=[
 {id:'beg-4',name:'Phụ kiện cơ bản',description:'Quấn cán, bình nước và túi đựng đồ.',url:'https://shopee.vn/',image:'',emoji:'🎒'}
 ];
 
-// PHẦN 4 - ĐỊA CHỈ MÁY CHỦ: thay bằng URL Cloudflare Worker sau khi triển khai.
-const API_BASE='https://YOUR-WORLD-WORKER.workers.dev';
+// PHẦN 4 - ĐỊA CHỈ MÁY CHỦ: Cloudflare Worker chính thức của bạn.
+const API_BASE='https://world-badminton-admin.caohung522122.workers.dev';
 
 // PHẦN 5 - ĐỌC DỮ LIỆU DỰ PHÒNG từ bộ nhớ trình duyệt.
 function load(key,fallback){try{const x=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(x)?x:fallback}catch(e){return fallback}}
@@ -34,7 +32,7 @@ let activeFilter='all',editingId=null,editingProductId=null,productGroup='popula
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // PHẦN 6 - KẾT NỐI API: gửi yêu cầu đến Cloudflare Worker.
-async function api(path,options={}){if(API_BASE.includes('YOUR-WORLD-WORKER'))throw new Error('Chưa cấu hình địa chỉ Cloudflare Worker.');const headers={...(options.headers||{})};if(options.body)headers['Content-Type']='application/json';const r=await fetch(API_BASE+path,{...options,headers,credentials:'include'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Không thể kết nối máy chủ.');return j}
+async function api(path,options={}){const headers={...(options.headers||{})};if(options.body)headers['Content-Type']='application/json';const r=await fetch(API_BASE+path,{...options,headers,credentials:'include'});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Không thể kết nối máy chủ.');return j}
 
 // PHẦN 7 - LƯU DỮ LIỆU: ghi hồ sơ và sản phẩm lên máy chủ.
 async function persist(){try{await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});localStorage.setItem('shineAthletes',JSON.stringify(athletes));localStorage.setItem('shinePopularProducts',JSON.stringify(popular));localStorage.setItem('shineBeginnerProducts',JSON.stringify(beginner));return true}catch(e){alert('Không thể lưu dữ liệu: '+e.message);return false}}
@@ -42,14 +40,11 @@ async function persist(){try{await api('/api/data',{method:'PUT',body:JSON.strin
 // PHẦN 8 - KHỞI TẠO WEBSITE: xác thực phiên và tải dữ liệu.
 async function initialize(){if(new URLSearchParams(location.search).get('admin')==='denied')alert('Tài khoản GitHub này không được cấp quyền quản trị.');try{const me=await api('/api/me');adminUser=me.user||null;const remote=await api('/api/data');if(remote.data){athletes=remote.data.athletes||[];popular=remote.data.popular||[];beginner=remote.data.beginner||[]}else if(adminUser){await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})})}}catch(e){console.warn('Máy chủ quản trị chưa kết nối:',e.message)}renderPlayers();renderProducts()}
 
-
 // PHẦN 9 - HIỂN THỊ TUYỂN THỦ và bộ lọc nội dung thi đấu.
-// Chuẩn hóa chữ để tìm kiếm không phân biệt chữ hoa, chữ thường và dấu tiếng Việt.
 function normalizeSearch(value){
  return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().trim();
 }
 
-// Hiển thị tuyển thủ theo cả bộ lọc nội dung thi đấu và từ khóa tìm kiếm.
 function renderPlayers(){
  const grid=document.getElementById('playerGrid');
  const searchInput=document.getElementById('playerSearch');
@@ -59,7 +54,7 @@ function renderPlayers(){
   const searchable=[a.name,a.country,a.discipline].map(normalizeSearch).join(' ');
   return matchesFilter&&(!keyword||searchable.includes(keyword));
  });
- grid.innerHTML=results.map(a=>`<button class="player-card ${a.image?'has-photo':''}" style="${a.image?`background-image:url('${esc(a.image)}')`:''}" data-open-player="${esc(a.id)}"><span class="person" style="${a.image?'display:none':''}"></span><span class="pinfo"><span class="tag">${esc((a.discipline||'').toUpperCase())}</span><h3>${esc(a.name)}</h3><span class="meta">🌏 ${esc(a.country||'Chưa cập nhật')} · ${esc(a.discipline)}</span><span class="view">XEM HỒ SƠ & TRANG BỊ <b>↗</b></span></span></button>`).join('')||(keyword||activeFilter!=='all'?'<p class="player-empty">Không tìm thấy vận động viên phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.</p>':'<div class="player-empty"><strong>Chưa có hồ sơ tuyển thủ.</strong><br>Danh sách sẽ xuất hiện sau khi bạn thêm hồ sơ trong mục Quản trị. Hãy cấu hình Cloudflare Worker và tài khoản GitHub quản trị trước khi thêm dữ liệu.</div>');
+ grid.innerHTML=results.map(a=>`<button class="player-card ${a.image?'has-photo':''}" style="${a.image?`background-image:url('${esc(a.image)}')`:''}" data-open-player="${esc(a.id)}"><span class="person" style="${a.image?'display:none':''}"></span><span class="pinfo"><span class="tag">${esc((a.discipline||'').toUpperCase())}</span><h3>${esc(a.name)}</h3><span class="meta">🌏 ${esc(a.country||'Chưa cập nhật')} · ${esc(a.discipline)}</span><span class="view">XEM HỒ SƠ & TRANG BỊ <b>↗</b></span></span></button>`).join('')||(keyword||activeFilter!=='all'?'<p class="player-empty">Không tìm thấy vận động viên phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.</p>':'<div class="player-empty"><strong>Chưa có hồ sơ tuyển thủ.</strong><br>Danh sách sẽ xuất hiện sau khi bạn thêm hồ sơ trong mục Quản trị.</div>');
 }
 
 // PHẦN 10 - HIỂN THỊ CÁC NHÓM SẢN PHẨM trên trang chủ.
@@ -83,12 +78,12 @@ document.getElementById('gearEditor')?.addEventListener('click',e=>{const btn=e.
 
 // PHẦN 13 - QUẢN TRỊ SẢN PHẨM: thêm, sửa và xóa sản phẩm.
 function renderProductAdmin(){const list=productGroup==='popular'?popular:beginner,current=list.find(x=>x.id===editingProductId),isPopular=productGroup==='popular';const main=document.getElementById('adminMain');main.innerHTML=`<h3>${isPopular?'Đồ nghề cầu lông anh em mua nhiều nhất':'Bộ đồ nghề cho người mới'}</h3><form id="productForm" class="admin-form"><div class="field"><label>Tên sản phẩm / món đồ</label><input name="name" required value="${esc(current?.name||'')}"></div>${isPopular?`<div class="field"><label>Danh mục / nhãn</label><input name="category" value="${esc(current?.category||'')}"></div>`:''}<div class="field full"><label>Mô tả</label><textarea name="description">${esc(current?.description||'')}</textarea></div><div class="field full"><label>Link sản phẩm / affiliate</label><input name="url" value="${esc(current?.url||'https://shopee.vn/')}" placeholder="https://..."></div><div class="field"><label>URL ảnh (nếu có)</label><input name="photoUrl" value="${esc(current?.image?.startsWith('data:')?'':current?.image||'')}" placeholder="https://..."></div><div class="field"><label>Hoặc tải ảnh từ máy</label><input name="photoFile" type="file" accept="image/*"></div><div class="field full">${current?.image?`<img class="image-preview" src="${esc(current.image)}" alt="Ảnh hiện tại">`:''}</div><div class="field full"><button class="save-btn" type="submit">${current?'LƯU SẢN PHẨM':'THÊM SẢN PHẨM'}</button> ${current?'<button class="mini-btn" type="button" id="cancelProduct">Hủy</button>':''}</div></form><h3>Danh sách hiện có</h3><div class="admin-list">${list.map(x=>`<div class="admin-row">${x.image?`<img src="${esc(x.image)}" alt="">`:''}<div style="flex:1"><b>${esc(x.name)}</b><small>${esc(x.description||'')}</small></div><button class="mini-btn" data-edit-product="${esc(x.id)}">Sửa</button> <button class="mini-btn" data-delete-product="${esc(x.id)}">Xóa</button></div>`).join('')||'<div class="empty-state">Chưa có sản phẩm.</div>'}</div>`;
-const form=document.getElementById('productForm');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);let image='';try{image=await imageValue(form,'photo',current?.image||'')}catch(err){alert('Không đọc được ảnh.');return}const item={id:current?.id||`${productGroup}-${Date.now()}`,name:fd.get('name'),description:fd.get('description'),url:fd.get('url'),image,emoji:current?.emoji||'🏸'};if(isPopular)item.category=fd.get('category')||'SẢN PHẨM';if(current){const idx=list.findIndex(x=>x.id===current.id);list[idx]=item}else list.push(item);editingProductId=null;if(await persist()){renderProducts();renderProductAdmin();alert('Đã lưu sản phẩm thành công.')}});document.getElementById('cancelProduct')?.addEventListener('click',()=>{editingProductId=null;renderProductAdmin()});}
+const form=document.getElementById('productForm');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);let image='';try{image=await imageValue(form,'photo',current?.image||'')}catch(err){alert('Không đọc được ảnh.');return}const item={id:current?.id||`${productGroup}-${Date.now()}`,name:fd.get('name'),description:fd.get('description'),url:fd.get('url'),image,emoji:current?.emoji||'🏸'};if(isPopular)item.category=fd.get('category']||'SẢN PHẨM';if(current){const idx=list.findIndex(x=>x.id===current.id);list[idx]=item}else list.push(item);editingProductId=null;if(await persist()){renderProducts();renderProductAdmin();alert('Đã lưu sản phẩm thành công.')}});document.getElementById('cancelProduct')?.addEventListener('click',()=>{editingProductId=null;renderProductAdmin()});}
 
 // PHẦN 14 - SỰ KIỆN: xử lý thao tác trên thẻ tuyển thủ và sản phẩm.
 document.addEventListener('click',async e=>{const player=e.target.closest('[data-open-player]');if(player){openDetail(player.dataset.openPlayer);return}const close=e.target.closest('[data-close]');if(close){hideOverlay(close.dataset.close);return}const edit=e.target.closest('[data-edit-athlete]');if(edit){editingId=edit.dataset.editAthlete;renderAdmin('athletes');return}const del=e.target.closest('[data-delete-athlete]');if(del&&confirm('Xóa hồ sơ tuyển thủ này?')){athletes=athletes.filter(a=>a.id!==del.dataset.deleteAthlete);editingId=null;await persist();renderAdmin('athletes');return}const ep=e.target.closest('[data-edit-product]');if(ep){editingProductId=ep.dataset.editProduct;renderProductAdmin();return}const dp=e.target.closest('[data-delete-product]');if(dp&&confirm('Xóa sản phẩm này?')){const arr=productGroup==='popular'?popular:beginner;const idx=arr.findIndex(x=>x.id===dp.dataset.deleteProduct);if(idx>=0)arr.splice(idx,1);editingProductId=null;await persist();renderProducts();renderProductAdmin();}});
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{activeFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderPlayers()}));
-document.getElementById('playerSearch')?.addEventListener('input',renderPlayers); // Cập nhật danh sách ngay khi nhập từ khóa.
+document.getElementById('playerSearch')?.addEventListener('input',renderPlayers);
 
 // PHẦN 15 - ĐĂNG NHẬP QUẢN TRỊ bằng tài khoản GitHub.
 document.getElementById('openAdmin').addEventListener('click',async()=>{try{const me=await api('/api/me');adminUser=me.user||null;if(!adminUser){location.href=API_BASE+'/auth/login';return}document.getElementById('adminIdentity').textContent='Đăng nhập: '+adminUser;editingId=null;editingProductId=null;renderAdmin('athletes');showOverlay('adminOverlay')}catch(e){alert('Chưa thể mở quản trị: '+e.message)}});
@@ -96,5 +91,6 @@ document.getElementById('openAdmin').addEventListener('click',async()=>{try{cons
 // PHẦN 16 - ĐĂNG XUẤT quản trị.
 document.getElementById('logoutAdmin').addEventListener('click',async()=>{try{await api('/auth/logout',{method:'POST'});}catch(e){}adminUser=null;hideOverlay('adminOverlay');alert('Đã đăng xuất.')});
 document.querySelectorAll('[data-admin-tab]').forEach(b=>b.addEventListener('click',()=>{editingId=null;editingProductId=null;renderAdmin(b.dataset.adminTab)}));document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)hideOverlay(o.id)}));document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>hideOverlay(o.id))});
+
 // PHẦN 17 - CHẠY WEBSITE.
 initialize();
