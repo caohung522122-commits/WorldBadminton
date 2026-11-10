@@ -1,5 +1,5 @@
 // =============================================================
-// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (BẢN CHUẨN DOM)
+// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (ĐÃ SỬA LỖI DÒNG 83)
 // =============================================================
 
 const seedAthletes=[];
@@ -96,7 +96,6 @@ function renderProductAdmin(){
  document.getElementById('cancelProduct')?.addEventListener('click',()=>{editingProductId=null;renderProductAdmin()});
 }
 
-// BỌC TOÀN BỘ SỰ KIỆN VÀ KHỞI TẠO VÀO DOMContentLoaded ĐỂ AN TOÀN 100%
 document.addEventListener('DOMContentLoaded', () => {
  document.addEventListener('click',async e=>{
   const player=e.target.closest('[data-open-player]');if(player){openDetail(player.dataset.openPlayer);return}
@@ -124,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
  document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)hideOverlay(o.id)}));
  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>hideOverlay(o.id))});
 
- // Chạy khởi tạo sau khi giao diện đã sẵn sàng
  async function initialize(){
   const params=new URLSearchParams(location.search);
   if(params.get('admin')==='denied') alert('Tài khoản GitHub này không được cấp quyền quản trị.');
