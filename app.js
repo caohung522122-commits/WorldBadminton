@@ -1,5 +1,5 @@
 // =============================================================
-// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (ĐÃ SỬA LỖI)
+// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (BẢN CHUẨN DOM)
 // =============================================================
 
 const seedAthletes=[];
@@ -35,34 +35,6 @@ async function api(path,options={}){
 }
 
 async function persist(){try{await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});localStorage.setItem('shineAthletes',JSON.stringify(athletes));localStorage.setItem('shinePopularProducts',JSON.stringify(popular));localStorage.setItem('shineBeginnerProducts',JSON.stringify(beginner));return true}catch(e){alert('Không thể lưu dữ liệu: '+e.message);return false}}
-
-async function initialize(){
- const params=new URLSearchParams(location.search);
- if(params.get('admin')==='denied') alert('Tài khoản GitHub này không được cấp quyền quản trị.');
- 
- const urlToken=params.get('token');
- if(urlToken){
-  localStorage.setItem('shine_token',urlToken);
-  history.replaceState({}, document.title, location.pathname);
- }
-
- try{
-  const me=await api('/api/me');
-  adminUser=me.user||null;
-  const remote=await api('/api/data');
-  if(remote.data){
-   athletes=remote.data.athletes||[];
-   popular=remote.data.popular||[];
-   beginner=remote.data.beginner||[];
-  }else if(adminUser){
-   await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});
-  }
- }catch(e){
-  console.warn('Máy chủ quản trị chưa kết nối:',e.message);
- }
- renderPlayers();
- renderProducts();
-}
 
 function normalizeSearch(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().trim();}
 
@@ -124,30 +96,62 @@ function renderProductAdmin(){
  document.getElementById('cancelProduct')?.addEventListener('click',()=>{editingProductId=null;renderProductAdmin()});
 }
 
-document.addEventListener('click',async e=>{
- const player=e.target.closest('[data-open-player]');if(player){openDetail(player.dataset.openPlayer);return}
- const close=e.target.closest('[data-close]');if(close){hideOverlay(close.dataset.close);return}
- const edit=e.target.closest('[data-edit-athlete]');if(edit){editingId=edit.dataset.editAthlete;renderAdmin('athletes');return}
- const del=e.target.closest('[data-delete-athlete]');if(del&&confirm('Xóa hồ sơ tuyển thủ này?')){athletes=athletes.filter(a=>a.id!==del.dataset.deleteAthlete);editingId=null;await persist();renderAdmin('athletes');return}
- const ep=e.target.closest('[data-edit-product]');if(ep){editingProductId=ep.dataset.editProduct;renderProductAdmin();return}
- const dp=e.target.closest('[data-delete-product]');if(dp&&confirm('Xóa sản phẩm này?')){const arr=productGroup==='popular'?popular:beginner;const idx=arr.findIndex(x=>x.id===dp.dataset.deleteProduct);if(idx>=0)arr.splice(idx,1);editingProductId=null;await persist();renderProducts();renderProductAdmin();}
+// BỌC TOÀN BỘ SỰ KIỆN VÀ KHỞI TẠO VÀO DOMContentLoaded ĐỂ AN TOÀN 100%
+document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('click',async e=>{
+  const player=e.target.closest('[data-open-player]');if(player){openDetail(player.dataset.openPlayer);return}
+  const close=e.target.closest('[data-close]');if(close){hideOverlay(close.dataset.close);return}
+  const edit=e.target.closest('[data-edit-athlete]');if(edit){editingId=edit.dataset.editAthlete;renderAdmin('athletes');return}
+  const del=e.target.closest('[data-delete-athlete]');if(del&&confirm('Xóa hồ sơ tuyển thủ này?')){athletes=athletes.filter(a=>a.id!==del.dataset.deleteAthlete);editingId=null;await persist();renderAdmin('athletes');return}
+  const ep=e.target.closest('[data-edit-product]');if(ep){editingProductId=ep.dataset.editProduct;renderProductAdmin();return}
+  const dp=e.target.closest('[data-delete-product]');if(dp&&confirm('Xóa sản phẩm này?')){const arr=productGroup==='popular'?popular:beginner;const idx=arr.findIndex(x=>x.id===dp.dataset.deleteProduct);if(idx>=0)arr.splice(idx,1);editingProductId=null;await persist();renderProducts();renderProductAdmin();}
+ });
+
+ document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{activeFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderPlayers()}));
+ document.getElementById('playerSearch')?.addEventListener('input',renderPlayers);
+
+ const openAdminBtn=document.getElementById('openAdmin');
+ if(openAdminBtn){
+  openAdminBtn.addEventListener('click',async()=>{try{const me=await api('/api/me');adminUser=me.user||null;if(!adminUser){location.href=API_BASE+'/auth/login';return}const iden=document.getElementById('adminIdentity');if(iden)iden.textContent='Đăng nhập: '+adminUser;editingId=null;editingProductId=null;renderAdmin('athletes');showOverlay('adminOverlay')}catch(e){alert('Chưa thể mở quản trị: '+e.message)}});
+ }
+
+ const logoutAdminBtn=document.getElementById('logoutAdmin');
+ if(logoutAdminBtn){
+  logoutAdminBtn.addEventListener('click',async()=>{try{await api('/auth/logout',{method:'POST'});}catch(e){}localStorage.removeItem('shine_token');adminUser=null;hideOverlay('adminOverlay');alert('Đã đăng xuất.')});
+ }
+
+ document.querySelectorAll('[data-admin-tab]').forEach(b=>b.addEventListener('click',()=>{editingId=null;editingProductId=null;renderAdmin(b.dataset.adminTab)}));
+ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)hideOverlay(o.id)}));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>hideOverlay(o.id))});
+
+ // Chạy khởi tạo sau khi giao diện đã sẵn sàng
+ async function initialize(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('admin')==='denied') alert('Tài khoản GitHub này không được cấp quyền quản trị.');
+  
+  const urlToken=params.get('token');
+  if(urlToken){
+   localStorage.setItem('shine_token',urlToken);
+   history.replaceState({}, document.title, location.pathname);
+  }
+
+  try{
+   const me=await api('/api/me');
+   adminUser=me.user||null;
+   const remote=await api('/api/data');
+   if(remote.data){
+    athletes=remote.data.athletes||[];
+    popular=remote.data.popular||[];
+    beginner=remote.data.beginner||[];
+   }else if(adminUser){
+    await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});
+   }
+  }catch(e){
+   console.warn('Máy chủ quản trị chưa kết nối:',e.message);
+  }
+  renderPlayers();
+  renderProducts();
+ }
+
+ initialize();
 });
-
-document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{activeFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderPlayers()}));
-document.getElementById('playerSearch')?.addEventListener('input',renderPlayers);
-
-const openAdminBtn=document.getElementById('openAdmin');
-if(openAdminBtn){
- openAdminBtn.addEventListener('click',async()=>{try{const me=await api('/api/me');adminUser=me.user||null;if(!adminUser){location.href=API_BASE+'/auth/login';return}const iden=document.getElementById('adminIdentity');if(iden)iden.textContent='Đăng nhập: '+adminUser;editingId=null;editingProductId=null;renderAdmin('athletes');showOverlay('adminOverlay')}catch(e){alert('Chưa thể mở quản trị: '+e.message)}});
-}
-
-const logoutAdminBtn=document.getElementById('logoutAdmin');
-if(logoutAdminBtn){
- logoutAdminBtn.addEventListener('click',async()=>{try{await api('/auth/logout',{method:'POST'});}catch(e){}localStorage.removeItem('shine_token');adminUser=null;hideOverlay('adminOverlay');alert('Đã đăng xuất.')});
-}
-
-document.querySelectorAll('[data-admin-tab]').forEach(b=>b.addEventListener('click',()=>{editingId=null;editingProductId=null;renderAdmin(b.dataset.adminTab)}));
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)hideOverlay(o.id)}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>hideOverlay(o.id))});
-
-initialize();
