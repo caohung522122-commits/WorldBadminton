@@ -1,5 +1,5 @@
 // =============================================================
-// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (TOKEN AUTH)
+// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (ĐÃ SỬA LỖI)
 // =============================================================
 
 const seedAthletes=[];
