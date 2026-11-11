@@ -1,5 +1,5 @@
 // =============================================================
-// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (ĐÃ SỬA LỖI DÒNG 83)
+// WORLD BADMINTON - JAVASCRIPT PHÍA TRÌNH DUYỆT (BẢN AN TOÀN CHUẨN)
 // =============================================================
 
 const seedAthletes=[];
@@ -34,7 +34,18 @@ async function api(path,options={}){
  return j;
 }
 
-async function persist(){try{await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});localStorage.setItem('shineAthletes',JSON.stringify(athletes));localStorage.setItem('shinePopularProducts',JSON.stringify(popular));localStorage.setItem('shineBeginnerProducts',JSON.stringify(beginner));return true}catch(e){alert('Không thể lưu dữ liệu: '+e.message);return false}}
+async function persist(){
+ try{
+  await api('/api/data',{method:'PUT',body:JSON.stringify({athletes,popular,beginner})});
+  localStorage.setItem('shineAthletes',JSON.stringify(athletes));
+  localStorage.setItem('shinePopularProducts',JSON.stringify(popular));
+  localStorage.setItem('shineBeginnerProducts',JSON.stringify(beginner));
+  return true;
+ }catch(e){
+  alert('Không thể lưu dữ liệu: '+e.message);
+  return false;
+ }
+}
 
 function normalizeSearch(value){return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().trim();}
 
@@ -59,14 +70,47 @@ function renderProducts(){
  if(begEl) begEl.innerHTML=beginner.map((p,i)=>`<article class="product"><div class="visual v${i%4+1}">${p.image?`<img class="product-photo" src="${esc(p.image)}" alt="${esc(p.name)}">`:esc(p.emoji||'🏸')}</div><div class="copy"><small>CHO NGƯỜI MỚI</small><h3>${esc(p.name)}</h3><p>${esc(p.description||'')}</p><a class="shoplink" href="${esc(p.url||'#')}" target="_blank" rel="noopener">Xem sản phẩm <b>↗</b></a></div></article>`).join('')||'<div class="empty-state">Chưa có bộ đồ nghề nào.</div>';
 }
 
-function openDetail(id){const a=athletes.find(x=>x.id===id);if(!a)return;const c=document.getElementById('detailContent');if(c)c.innerHTML=`<div class="profile-hero"><div class="avatar" style="${a.image?`background:url('${esc(a.image)}') center/cover`:''}">${a.image?'':'🏸'}</div><div><span class="tag">${esc(a.discipline)}</span><h1>${esc(a.name)}</h1><p>${esc(a.country||'Chưa cập nhật')} · Tay thuận: ${esc(a.hand||'Chưa cập nhật')}</p><p>${esc(a.bio||'')}</p></div></div><div class="stats-grid"><div class="statbox"><small>Chiều cao</small><strong>${esc(a.height||'Chưa cập nhật')}</strong></div><div class="statbox"><small>Cân nặng</small><strong>${esc(a.weight||'Chưa cập nhật')}</strong></div><div class="statbox"><small>Mức căng lưới</small><strong>${esc(a.tension||'Chưa xác minh')}</strong></div><div class="statbox"><small>Nội dung thi đấu</small><strong>${esc(a.discipline)}</strong></div></div><section class="detail-section"><h3>Danh hiệu nổi bật</h3><div class="detail-awards">${(a.awards||[]).length?`<ul class="award-list">${a.awards.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p>Chưa cập nhật danh hiệu.</p>'}</div></section><section class="detail-section"><h3>Đồ nghề / trang bị</h3><div class="gear-grid">${(a.gear||[]).map(g=>`<article class="gear-card">${g.image?`<img class="product-photo" style="height:130px;border-radius:7px" src="${esc(g.image)}" alt="${esc(g.name)}">`:''}<small>${esc(g.type||'TRANG BỊ')}</small><h4>${esc(g.name)}</h4><p>${esc(g.detail||'')}</p>${g.url?`<a class="shoplink" href="${esc(g.url)}" target="_blank" rel="noopener">Xem sản phẩm <b>↗</b></a>`:'<span>Chưa có link</span>'}</article>`).join('')||'<p>Chưa cập nhật trang bị.</p>'}</div></section>`;showOverlay('detailOverlay');}
+function openDetail(id){
+ const a=athletes.find(x=>x.id===id);
+ if(!a)return;
+ const c=document.getElementById('detailContent');
+ if(c) c.innerHTML=`<div class="profile-hero"><div class="avatar" style="${a.image?`background:url('${esc(a.image)}') center/cover`:''}">${a.image?'':'🏸'}</div><div><span class="tag">${esc(a.discipline)}</span><h1>${esc(a.name)}</h1><p>${esc(a.country||'Chưa cập nhật')} · Tay thuận: ${esc(a.hand||'Chưa cập nhật')}</p><p>${esc(a.bio||'')}</p></div></div><div class="stats-grid"><div class="statbox"><small>Chiều cao</small><strong>${esc(a.height||'Chưa cập nhật')}</strong></div><div class="statbox"><small>Cân nặng</small><strong>${esc(a.weight||'Chưa cập nhật')}</strong></div><div class="statbox"><small>Mức căng lưới</small><strong>${esc(a.tension||'Chưa xác minh')}</strong></div><div class="statbox"><small>Nội dung thi đấu</small><strong>${esc(a.discipline)}</strong></div></div><section class="detail-section"><h3>Danh hiệu nổi bật</h3><div class="detail-awards">${(a.awards||[]).length?`<ul class="award-list">${a.awards.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p>Chưa cập nhật danh hiệu.</p>'}</div></section><section class="detail-section"><h3>Đồ nghề / trang bị</h3><div class="gear-grid">${(a.gear||[]).map(g=>`<article class="gear-card">${g.image?`<img class="product-photo" style="height:130px;border-radius:7px" src="${esc(g.image)}" alt="${esc(g.name)}">`:''}<small>${esc(g.type||'TRANG BỊ')}</small><h4>${esc(g.name)}</h4><p>${esc(g.detail||'')}</p>${g.url?`<a class="shoplink" href="${esc(g.url)}" target="_blank" rel="noopener">Xem sản phẩm <b>↗</b></a>`:'<span>Chưa có link</span>'}</article>`).join('')||'<p>Chưa cập nhật trang bị.</p>'}</div></section>`;
+ showOverlay('detailOverlay');
+}
 
 function showOverlay(id){const el=document.getElementById(id);if(el){el.classList.add('open');el.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}}
 function hideOverlay(id){const el=document.getElementById(id);if(el){el.classList.remove('open');el.setAttribute('aria-hidden','true');document.body.style.overflow=''}}
 
-function imageValue(form,prefix,old=''){const url=form.querySelector(`[name="${prefix}Url"]`)?.value.trim();const file=form.querySelector(`[name="${prefix}File"]`)?.files?.[0];if(file)return compressImage(file);return Promise.resolve(url||old||'')}
-function compressImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/webp',.78))};img.onerror=()=>reject(Error('Ảnh không hợp lệ'));img.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})}
-function gearEditorHTML(items){return items.map((g,i)=>`<div class="gear-edit-row"><div class="gear-edit-head"><span>Món đồ ${i+1}</span><button type="button" class="mini-btn" data-remove-gear>Xóa món này</button></div><div class="gear-edit-grid"><div class="field"><label>Loại đồ</label><input data-gear-type value="${esc(g.type||'')}" placeholder="Vợt / Giày / Túi..."></div><div class="field"><label>Tên sản phẩm</label><input data-gear-name value="${esc(g.name||'')}" placeholder="Tên món đồ"></div><div class="field full"><label>Mô tả</label><textarea data-gear-detail>${esc(g.detail||'')}</textarea></div><div class="field full"><label>Link sản phẩm / affiliate</label><input data-gear-url value="${esc(g.url||'')}" placeholder="https://shopee.vn/..."></div><div class="field"><label>URL ảnh</label><input data-gear-image-url value="${esc(g.image?.startsWith('data:')?'':g.image||'')}" placeholder="https://..."></div><div class="field"><label>Tải ảnh từ máy</label><input data-gear-image-file type="file" accept="image/*"></div><div class="field full">${g.image?`<img class="image-preview" src="${esc(g.image)}" alt="Ảnh món đồ">`:''}<input type="hidden" data-gear-old-image value="${esc(g.image||'')}"></div></div></div>`).join('')||''}
+function imageValue(form,prefix,old=''){
+ const url=form.querySelector(`[name="${prefix}Url"]`)?.value.trim();
+ const file=form.querySelector(`[name="${prefix}File"]`)?.files?.[0];
+ if(file)return compressImage(file);
+ return Promise.resolve(url||old||'');
+}
+
+function compressImage(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>{
+   const img=new Image();
+   img.onload=()=>{
+    const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');
+    c.width=Math.round(img.width*scale);
+    c.height=Math.round(img.height*scale);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    resolve(c.toDataURL('image/webp',.78));
+   };
+   img.onerror=()=>reject(Error('Ảnh không hợp lệ'));
+   img.src=reader.result;
+  };
+  reader.onerror=reject;
+  reader.readAsDataURL(file);
+ });
+}
+
+function gearEditorHTML(items){
+ return items.map((g,i)=>`<div class="gear-edit-row"><div class="gear-edit-head"><span>Món đồ ${i+1}</span><button type="button" class="mini-btn" data-remove-gear>Xóa món này</button></div><div class="gear-edit-grid"><div class="field"><label>Loại đồ</label><input data-gear-type value="${esc(g.type||'')}" placeholder="Vợt / Giày / Túi..."></div><div class="field"><label>Tên sản phẩm</label><input data-gear-name value="${esc(g.name||'')}" placeholder="Tên món đồ"></div><div class="field full"><label>Mô tả</label><textarea data-gear-detail>${esc(g.detail||'')}</textarea></div><div class="field full"><label>Link sản phẩm / affiliate</label><input data-gear-url value="${esc(g.url||'')}" placeholder="https://shopee.vn/..."></div><div class="field"><label>URL ảnh</label><input data-gear-image-url value="${esc(g.image?.startsWith('data:')?'':g.image||'')}" placeholder="https://..."></div><div class="field"><label>Tải ảnh từ máy</label><input data-gear-image-file type="file" accept="image/*"></div><div class="field full">${g.image?`<img class="image-preview" src="${esc(g.image)}" alt="Ảnh món đồ">`:''}<input type="hidden" data-gear-old-image value="${esc(g.image||'')}"></div></div></div>`).join('')||'';
+}
 
 function renderAdmin(tab='athletes'){
  document.querySelectorAll('[data-admin-tab]').forEach(b=>b.classList.toggle('active',b.dataset.adminTab===tab));
@@ -77,25 +121,123 @@ function renderAdmin(tab='athletes'){
  main.innerHTML=`<h3>${current?'Chỉnh sửa tuyển thủ':'Thêm tuyển thủ'}</h3><form id="athleteForm" class="admin-form"><div class="field"><label>Họ tên vận động viên</label><input name="name" required value="${esc(current?.name||'')}" placeholder="Nhập họ tên"></div><div class="field"><label>Quốc gia</label><input name="country" value="${esc(current?.country||'')}" placeholder="Ví dụ: Việt Nam"></div><div class="field"><label>Nội dung thi đấu</label><select name="discipline">${['Đơn nam','Đơn nữ','Đôi nam','Đôi nữ','Đôi nam nữ'].map(v=>`<option ${current?.discipline===v?'selected':''}>${v}</option>`).join('')}</select></div><div class="field"><label>Tay thuận</label><input name="hand" value="${esc(current?.hand||'')}" placeholder="Phải / Trái"></div><div class="field"><label>Chiều cao</label><input name="height" value="${esc(current?.height||'')}" placeholder="Ví dụ: 178 cm"></div><div class="field"><label>Cân nặng</label><input name="weight" value="${esc(current?.weight||'')}" placeholder="Ví dụ: 70 kg"></div><div class="field"><label>Mức căng lưới</label><input name="tension" value="${esc(current?.tension||'')}" placeholder="Ví dụ: 28 lbs"></div><div class="field"><label>Ảnh tuyển thủ (URL)</label><input name="photoUrl" value="${esc(current?.image?.startsWith('data:')?'':current?.image||'')}" placeholder="https://..."></div><div class="field"><label>Tải ảnh từ máy</label><input name="photoFile" type="file" accept="image/*"></div><div class="field full"><label>Giới thiệu / ghi chú</label><textarea name="bio">${esc(current?.bio||'')}</textarea></div><div class="field full"><label>Danh hiệu nổi bật (mỗi danh hiệu một dòng)</label><textarea name="awards" placeholder="Ví dụ: Vô địch giải ... năm ...">${esc((current?.awards||[]).join('\n'))}</textarea></div><div class="field full"><label>Đồ nghề tuyển thủ</label><div id="gearEditor" class="gear-editor">${gearEditorHTML(current?.gear||[])}</div><button class="mini-btn add-gear" type="button" id="addGear">＋ Thêm món đồ</button></div><div class="field full"><button class="save-btn" type="submit">${current?'LƯU HỒ SƠ':'THÊM TUYỂN THỦ'}</button> ${current?'<button class="mini-btn" type="button" id="cancelEdit">Hủy</button>':''}</div></form><h3>Danh sách tuyển thủ</h3><div class="admin-list">${athletes.map(a=>`<div class="admin-row">${a.image?`<img src="${esc(a.image)}" alt="">`:''}<div style="flex:1"><b>${esc(a.name)}</b><small>${esc(a.discipline)} · ${esc(a.country)}</small></div><button class="mini-btn" data-edit-athlete="${esc(a.id)}">Sửa</button> <button class="mini-btn" data-delete-athlete="${esc(a.id)}">Xóa</button></div>`).join('')}</div>`;
  const form=document.getElementById('athleteForm');
  if(form){
-  form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);let image='';try{image=await imageValue(form,'photo',current?.image||'')}catch(err){alert('Không đọc được ảnh.');return}const gear=[];for(const row of form.querySelectorAll('.gear-edit-row')){const file=row.querySelector('[data-gear-image-file]')?.files?.[0];let gearImage=row.querySelector('[data-gear-image-url]')?.value.trim()||row.querySelector('[data-gear-old-image]')?.value||'';if(file){try{gearImage=await compressImage(file)}catch(err){alert('Không đọc được ảnh của một món đồ.');return}}const item={type:row.querySelector('[data-gear-type]')?.value.trim()||'',name:row.querySelector('[data-gear-name]')?.value.trim()||'',detail:row.querySelector('[data-gear-detail]')?.value.trim()||'',url:row.querySelector('[data-gear-url]')?.value.trim()||'',image:gearImage};if(item.type||item.name||item.detail||item.url||item.image)gear.push(item)}const data={id:current?.id||('athlete-'+Date.now()),name:fd.get('name'),country:fd.get('country'),discipline:fd.get('discipline'),hand:fd.get('hand'),height:fd.get('height'),weight:fd.get('weight'),tension:fd.get('tension'),bio:fd.get('bio'),image,awards:String(fd.get('awards')||'').split('\n').map(x=>x.trim()).filter(Boolean),gear};if(current)athletes=athletes.map(a=>a.id===current.id?data:a);else athletes.push(data);editingId=null;if(await persist()){renderPlayers();renderAdmin('athletes');alert('Đã lưu thành công.');}});
+  form.addEventListener('submit',async e=>{
+   e.preventDefault();
+   const fd=new FormData(form);
+   let image='';
+   try{
+    image=await imageValue(form,'photo',current?.image||'');
+   }catch(err){
+    alert('Không đọc được ảnh.');
+    return;
+   }
+   const gear=[];
+   for(const row of form.querySelectorAll('.gear-edit-row')){
+    const file=row.querySelector('[data-gear-image-file]')?.files?.[0];
+    let gearImage=row.querySelector('[data-gear-image-url]')?.value.trim()||row.querySelector('[data-gear-old-image]')?.value||'';
+    if(file){
+     try{
+      gearImage=await compressImage(file);
+     }catch(err){
+      alert('Không đọc được ảnh của một món đồ.');
+      return;
+     }
+    }
+    const item={
+     type:row.querySelector('[data-gear-type]')?.value.trim()||'',
+     name:row.querySelector('[data-gear-name]')?.value.trim()||'',
+     detail:row.querySelector('[data-gear-detail]')?.value.trim()||'',
+     url:row.querySelector('[data-gear-url]')?.value.trim()||'',
+     image:gearImage
+    };
+    if(item.type||item.name||item.detail||item.url||item.image) gear.push(item);
+   }
+   const data={
+    id:current?.id||('athlete-'+Date.now()),
+    name:fd.get('name'),
+    country:fd.get('country'),
+    discipline:fd.get('discipline'),
+    hand:fd.get('hand'),
+    height:fd.get('height'),
+    weight:fd.get('weight'),
+    tension:fd.get('tension'),
+    bio:fd.get('bio'),
+    image,
+    awards:String(fd.get('awards')||'').split('\n').map(x=>x.trim()).filter(Boolean),
+    gear
+   };
+   if(current) athletes=athletes.map(a=>a.id===current.id?data:a);
+   else athletes.push(data);
+   editingId=null;
+   if(await persist()){
+    renderPlayers();
+    renderAdmin('athletes');
+    alert('Đã lưu thành công.');
+   }
+  });
  }
  document.getElementById('cancelEdit')?.addEventListener('click',()=>{editingId=null;renderAdmin('athletes')});
- document.getElementById('addGear')?.addEventListener('click',()=>{const editor=document.getElementById('gearEditor');if(editor){editor.insertAdjacentHTML('beforeend',gearEditorHTML([{type:'',name:'',detail:'',url:'',image:''}]));editor.querySelectorAll('.gear-edit-head span').forEach((el,i)=>el.textContent=`Món đồ ${i+1}`)});
- document.getElementById('gearEditor')?.addEventListener('click',e=>{const btn=e.target.closest('[data-remove-gear]');if(!btn)return;btn.closest('.gear-edit-row').remove();document.querySelectorAll('#gearEditor .gear-edit-head span').forEach((el,i)=>el.textContent=`Món đồ ${i+1}`)});
+ document.getElementById('addGear')?.addEventListener('click',()=>{
+  const editor=document.getElementById('gearEditor');
+  if(editor){
+   editor.insertAdjacentHTML('beforeend',gearEditorHTML([{type:'',name:'',detail:'',url:'',image:''}]));
+   editor.querySelectorAll('.gear-edit-head span').forEach((el,i)=>el.textContent=`Món đồ ${i+1}`);
+  }
+ });
+ document.getElementById('gearEditor')?.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-remove-gear]');
+  if(!btn)return;
+  btn.closest('.gear-edit-row').remove();
+  document.querySelectorAll('#gearEditor .gear-edit-head span').forEach((el,i)=>el.textContent=`Món đồ ${i+1}`);
+ });
 }
 
 function renderProductAdmin(){
- const list=productGroup==='popular'?popular:beginner,current=list.find(x=>x.id===editingProductId),isPopular=productGroup==='popular';
+ const list=productGroup==='popular'?popular:beginner;
+ const current=list.find(x=>x.id===editingProductId);
+ const isPopular=productGroup==='popular';
  const main=document.getElementById('adminMain');
  if(!main)return;
  main.innerHTML=`<h3>${isPopular?'Đồ nghề cầu lông anh em mua nhiều nhất':'Bộ đồ nghề cho người mới'}</h3><form id="productForm" class="admin-form"><div class="field"><label>Tên sản phẩm / món đồ</label><input name="name" required value="${esc(current?.name||'')}"></div>${isPopular?`<div class="field"><label>Danh mục / nhãn</label><input name="category" value="${esc(current?.category||'')}"></div>`:''}<div class="field full"><label>Mô tả</label><textarea name="description">${esc(current?.description||'')}</textarea></div><div class="field full"><label>Link sản phẩm / affiliate</label><input name="url" value="${esc(current?.url||'https://shopee.vn/')}" placeholder="https://..."></div><div class="field"><label>URL ảnh (nếu có)</label><input name="photoUrl" value="${esc(current?.image?.startsWith('data:')?'':current?.image||'')}" placeholder="https://..."></div><div class="field"><label>Hoặc tải ảnh từ máy</label><input name="photoFile" type="file" accept="image/*"></div><div class="field full">${current?.image?`<img class="image-preview" src="${esc(current.image)}" alt="Ảnh hiện tại">`:''}</div><div class="field full"><button class="save-btn" type="submit">${current?'LƯU SẢN PHẨM':'THÊM SẢN PHẨM'}</button> ${current?'<button class="mini-btn" type="button" id="cancelProduct">Hủy</button>':''}</div></form><h3>Danh sách hiện có</h3><div class="admin-list">${list.map(x=>`<div class="admin-row">${x.image?`<img src="${esc(x.image)}" alt="">`:''}<div style="flex:1"><b>${esc(x.name)}</b><small>${esc(x.description||'')}</small></div><button class="mini-btn" data-edit-product="${esc(x.id)}">Sửa</button> <button class="mini-btn" data-delete-product="${esc(x.id)}">Xóa</button></div>`).join('')||'<div class="empty-state">Chưa có sản phẩm.</div>'}</div>`;
  const form=document.getElementById('productForm');
  if(form){
-  form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);let image='';try{image=await imageValue(form,'photo',current?.image||'')}catch(err){alert('Không đọc được ảnh.');return}const item={id:current?.id||`${productGroup}-${Date.now()}`,name:fd.get('name'),description:fd.get('description'),url:fd.get('url'),image,emoji:current?.emoji||'🏸'};if(isPopular)item.category=fd.get('category')||'SẢN PHẨM';if(current){const idx=list.findIndex(x=>x.id===current.id);list[idx]=item}else list.push(item);editingProductId=null;if(await persist()){renderProducts();renderProductAdmin();alert('Đã lưu sản phẩm thành công.')}});
+  form.addEventListener('submit',async e=>{
+   e.preventDefault();
+   const fd=new FormData(form);
+   let image='';
+   try{
+    image=await imageValue(form,'photo',current?.image||'');
+   }catch(err){
+    alert('Không đọc được ảnh.');
+    return;
+   }
+   const item={
+    id:current?.id||`${productGroup}-${Date.now()}`,
+    name:fd.get('name'),
+    description:fd.get('description'),
+    url:fd.get('url'),
+    image,
+    emoji:current?.emoji||'🏸'
+   };
+   if(isPopular) item.category=fd.get('category')||'SẢN PHẨM';
+   if(current){
+    const idx=list.findIndex(x=>x.id===current.id);
+    list[idx]=item;
+   }else{
+    list.push(item);
+   }
+   editingProductId=null;
+   if(await persist()){
+    renderProducts();
+    renderProductAdmin();
+    alert('Đã lưu sản phẩm thành công.');
+   }
+  });
  }
  document.getElementById('cancelProduct')?.addEventListener('click',()=>{editingProductId=null;renderProductAdmin()});
 }
 
+// KHỞI TẠO AN TOÀN KHI GIAO DIỆN ĐÃ TẢI XONG
 document.addEventListener('DOMContentLoaded', () => {
  document.addEventListener('click',async e=>{
   const player=e.target.closest('[data-open-player]');if(player){openDetail(player.dataset.openPlayer);return}
